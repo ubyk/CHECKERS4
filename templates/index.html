@@ -9,9 +9,13 @@
 <body>
     <div class="game-container">
         <h1>AI Checkers Game</h1>
-        <div id="board" class="board"></div>
+        <div class="board-container">
+            <div id="board" class="board"></div>
+        </div>
+        <div id="current-player"></div>
         <div class="controls">
-            <button id="start-button">Start New Game</button>
+            <button id="startNewGame" class="game-button">Start New Game</button>
+            <button id="resetGame" class="game-button">Reset Game</button>
         </div>
         <div id="reasoning" class="reasoning"></div>
     </div>

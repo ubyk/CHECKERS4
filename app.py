@@ -9,6 +9,9 @@ app.config.from_object(config.Config)
 
 init_db()
 
+# Store active games in memory (in a real app, use a database)
+active_games = {}
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -16,33 +19,40 @@ def index():
 @app.route('/start_game', methods=['POST'])
 def start_game():
     game = CheckersGame()
-    player1 = AIPlayer("Player 1")
-    player2 = AIPlayer("Player 2")
-    game_id = game.id
-    return jsonify({"game_id": game_id, "board": game.get_board()})
+    active_games[game.id] = game
+    return jsonify({"game_id": game.id, "board": game.get_board(), "current_player": game.current_player})
 
 @app.route('/make_move', methods=['POST'])
 def make_move():
     game_id = request.json['game_id']
-    game = CheckersGame.get_game(game_id)
-    current_player = AIPlayer("Current Player")
+    game = active_games.get(game_id)
+
+    if not game:
+        return jsonify({"error": "Game not found"}), 404
+
+    current_player = AIPlayer(f"AI {game.current_player.capitalize()}")
     move, reasoning = current_player.get_move(game)
-    game.make_move(move)
-    
+
+    if move:
+        game.make_move(move)
+
     if game.is_game_over():
         winner = game.get_winner()
         save_game_result(game_id, winner)
+        del active_games[game_id]
         return jsonify({
             "board": game.get_board(),
             "game_over": True,
             "winner": winner,
-            "reasoning": reasoning
+            "reasoning": reasoning,
+            "current_player": game.current_player
         })
-    
+
     return jsonify({
         "board": game.get_board(),
         "game_over": False,
-        "reasoning": reasoning
+        "reasoning": reasoning,
+        "current_player": game.current_player
     })
 
 if __name__ == '__main__':
