@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Checkers Game</title>
+    <title>AI vs AI Checkers</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
     <div class="game-container">
-        <h1>AI Checkers Game</h1>
+        <h1>AI vs AI Checkers</h1>
         <div class="board-container">
             <div id="board" class="board"></div>
         </div>
         <div id="current-player"></div>
         <div class="controls">
-            <button id="startNewGame" class="game-button">Start New Game</button>
-            <button id="resetGame" class="game-button">Reset Game</button>
+            <button id="startNewGame" class="game-button">Start Match</button>
+            <button id="resetGame" class="game-button">Reset Board</button>
         </div>
         <div id="reasoning" class="reasoning"></div>
     </div>

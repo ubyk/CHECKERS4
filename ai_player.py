@@ -1,37 +1,35 @@
-import openai
-import os
 import random
 
 class AIPlayer:
     def __init__(self, name):
         self.name = name
-        openai.api_key = os.environ.get('OPENAI_API_KEY')
 
     def get_move(self, game):
         valid_moves = self.get_valid_moves(game)
         if not valid_moves:
             return None, "No valid moves available."
 
-        # For now, let's use a simple strategy instead of OpenAI
         move = self.choose_best_move(game, valid_moves)
-        reasoning = f"Move chosen: {move[0]} to {move[1]}"
+        reasoning = self.describe_move(move)
         return move, reasoning
 
     def get_valid_moves(self, game):
-        valid_moves = []
-        for row in range(8):
-            for col in range(8):
-                if game.board[row][col].lower() == game.current_player[0]:
-                    for dr, dc in [(-1, -1), (-1, 1), (1, -1), (1, 1)]:
-                        if game.is_valid_move((row, col), (row + dr, col + dc)):
-                            valid_moves.append(((row, col), (row + dr, col + dc)))
-                        if game.is_valid_move((row, col), (row + 2*dr, col + 2*dc)):
-                            valid_moves.append(((row, col), (row + 2*dr, col + 2*dc)))
-        return valid_moves
+        return game.get_all_valid_moves()
 
     def choose_best_move(self, game, valid_moves):
-        # Prioritize captures
-        captures = [move for move in valid_moves if abs(move[0][0] - move[1][0]) == 2]
+        captures = [
+            move for move in valid_moves
+            if any(abs(start[0] - end[0]) == 2 for start, end in move)
+        ]
         if captures:
-            return random.choice(captures)
+            longest_capture = max(len(move) for move in captures)
+            strongest_captures = [move for move in captures if len(move) == longest_capture]
+            return random.choice(strongest_captures)
         return random.choice(valid_moves)
+
+    def describe_move(self, move):
+        path = [move[0][0]] + [step[1] for step in move]
+        path_text = " -> ".join(str(position) for position in path)
+        if any(abs(start[0] - end[0]) == 2 for start, end in move):
+            return f"Capture sequence: {path_text}"
+        return f"Move chosen: {path_text}"

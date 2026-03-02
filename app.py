@@ -30,7 +30,8 @@ def make_move():
     if not game:
         return jsonify({"error": "Game not found"}), 404
 
-    current_player = AIPlayer(f"AI {game.current_player.capitalize()}")
+    moving_player = game.current_player
+    current_player = AIPlayer(f"AI {moving_player.capitalize()}")
     move, reasoning = current_player.get_move(game)
 
     if move:
@@ -45,14 +46,16 @@ def make_move():
             "game_over": True,
             "winner": winner,
             "reasoning": reasoning,
-            "current_player": game.current_player
+            "current_player": game.current_player,
+            "last_player": moving_player
         })
 
     return jsonify({
         "board": game.get_board(),
         "game_over": False,
         "reasoning": reasoning,
-        "current_player": game.current_player
+        "current_player": game.current_player,
+        "last_player": moving_player
     })
 
 if __name__ == '__main__':
